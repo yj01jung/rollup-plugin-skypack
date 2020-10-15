@@ -1,90 +1,62 @@
-# @vinicius73/rollup-plugin-skypack-resolver
+# rollup-plugin-skypack
 
-Generate the bundle of your project using [Skypack CDN](https://www.skypack.dev) for external dependencies.
+Skypack https://www.skypack.dev/
+Everything on npm, delivered directly to your browser.
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/5fa12e0c2482b3da931f/maintainability)](https://codeclimate.com/github/vinicius73/rollup-plugin-pika-resolver/maintainability)
-[![Build Status](https://scrutinizer-ci.com/g/vinicius73/rollup-plugin-pika-resolver/badges/build.png?b=master)](https://scrutinizer-ci.com/g/vinicius73/rollup-plugin-pika-resolver/build-status/master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/vinicius73/rollup-plugin-pika-resolver/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/vinicius73/rollup-plugin-pika-resolver/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/vinicius73/rollup-plugin-pika-resolver/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/vinicius73/rollup-plugin-pika-resolver/?branch=master)
-[![@vinicius73/rollup-plugin-skypack-resolver](https://img.shields.io/npm/v/@vinicius73/rollup-plugin-skypack-resolver)](https://www.npmjs.com/package/@vinicius73/rollup-plugin-skypack-resolver)
+Can boost load for commonly used module with cdn (like react, lodash)
+
+# WARNING THIS PLUGIN IS UNOFFICIAL
+
+## Features
+
+- Auto resolving PINNED urls
 
 ## Install
 
 ```sh
-yarn add @vinicius73/rollup-plugin-skypack-resolver rollup -D
+yarn add rollup-plugin-skypack
 ```
 
 ## Usage
 
-On this example, [axios](https://www.skypack.dev/npm/axios) and [lodash-es](https://www.skypack.dev/npm/lodash-es) need be installed as project dependencies, using [npm](https://www.npmjs.com/get-npm) or [yarn](https://classic.yarnpkg.com/en/docs/install).
-
-> `skypackResolver` uses your local dependencies to determine cdn version.
+it is recommended to install the local dependencies with npm and yarn (but optional, default use latest version)
 
 ```js
 //> rollup.config.js
-const { skypackResolver } = require('@vinicius73/rollup-plugin-skypack-resolver')
+
+import skypack from 'rollup-plugin-skypack';
 
 module.exports = {
   input: 'src/index.js',
   output: {
-    format: 'es'
+    format: 'es',
   },
-  plugins: [skypackResolver({
-    modules: ['axios', 'lodash-es']
-  })]
-}
-```
-
-```js
-//> src/index.js
-import axios from 'axios'
-import { get } from 'lodash-es'
-
-const run = async () => {
-  const { data } = await axios.get('https://reqres.in/api/users/2')
-  
-  console.log(
-    get(data, ['data', 'email'])
-  )
-}
-
-run()
-  .then(() => console.log('All done'))
-  .catch(err => console.error(err))
-```
-
-```sh
-rullup -c
-```
-
-```js
-//> output
-import axios from 'https://cdn.skypack.dev/axios@0.20.0';
-import { get } from 'https://cdn.skypack.dev/lodash-es@4.17.15';
-
-const run = async () => {
-  const { data } = await axios.get('https://reqres.in/api/users/2');
-  console.log(get(data, ['data', 'email']));
+  plugins: [
+    skypack({
+      modules: ['axios', 'react', 'react-dom'],
+      optimize: true, // USE PINNED URL, false for lookup url
+    }),
+  ],
 };
-
-run()
-  .then(() => console.log('All done'))
-  .catch(err => console.error(err));
 ```
 
 ## Options
 
-### `modules`
-
-Type: `Array[...String]`  
-Required: `true`  
-
-An array with modules that will be transformed into cdn import.
-
-### `cdnHost`
-
-Type: `String`  
-Required: `false`  
-Default: `https://cdn.skypack.dev`  
-
-Host used in imports.
+```ts
+interface SkypackPluginOptions {
+  /**
+   * desired module would load with skypack cdn, and remove at the bundle
+   */
+  modules: string[];
+  /**
+   * @see https://docs.skypack.dev/lookup-urls/pinned-urls-optimized
+   *
+   * if true use pinned url (load fast but build is slow, for production)
+   *
+   * if false use lookup url (build fast)
+   *
+   * @example optimize: process.env.NODE_ENV === 'production'
+   */
+  optimize: boolean;
+}
+```

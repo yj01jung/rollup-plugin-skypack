@@ -12,6 +12,7 @@
     "allowJs": false,
     "target": "ES2018",
     "module": "CommonJS",
+    "skipLibCheck": true,
     "outDir": "dist",
     "esModuleInterop": true,
     "moduleResolution": "node",
